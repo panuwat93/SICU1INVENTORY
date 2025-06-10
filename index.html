@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SICU1 SMART INVENTORY - Default Inspired</title>
+
+<!-- Link to manifest.json for PWA -->
+<link rel="manifest" href="manifest.json" />
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+  :root {
+    --color-bg: #ffffff;
+    --color-text: #6b7280; /* Neutral gray */
+    --color-primary: #111827; /* Dark neutral for headings and buttons */
+    --color-primary-light: #374151; /* Slightly lighter for hover */
+    --color-primary-lighter: #4b5563;
+    --color-card-bg: #f9fafb;
+    --color-input-bg: #ffffff;
+    --color-border: #e5e7eb;
+    --color-error: #ef4444;
+    --color-success: #10b981;
+    --radius: 0.75rem;
+    --spacing-vertical: 4rem; /* 64px */
+    --spacing-horizontal: 3rem; /* 48px */
+    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --transition-speed: 0.3s;
+    --font-family: 'Poppins', sans-serif;
+  }
+
+  /* Reset */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0; padding: 0;
+    font-family: var(--font-family);
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    line-height: 1.6;
+    font-size: 17px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    user-select: text;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--spacing-vertical) var(--spacing-horizontal) calc(var(--spacing-vertical) * 0.75);
+  }
+
+  h1 {
+    font-weight: 700;
+    font-size: 56px;
+    margin-bottom: 1rem;
+    color: var(--color-primary);
+    user-select: text;
+    line-height: 1.1;
+  }
+
+  h2 {
+    font-weight: 600;
+    font-size: 32px;
+    margin-bottom: 1.25rem;
+    user-select: text;
+    color: var(--color-primary-light);
+  }
+
+  h3 {
+    font-weight: 600;
+    font-size: 22px;
+    margin-bottom: 1rem;
+    color: var(--color-primary-lighter);
+  }
+
+  p {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: var(--color-text);
+    font-size: 17px;
+  }
+
+  /* Buttons */
+
+  button {
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 18px;
+    padding: 0.9rem 1.8rem;
+    border-radius: var(--radius);
+    border: none;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color var(--transition-speed), color var(--transition-speed), box-shadow var(--transition-speed), transform var(--transition-speed);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    background-color: var(--color-primary);
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(17, 24, 39, 0.15);
+  }
+
+  button:hover:not(:disabled) {
+    background-color: var(--color-primary-light);
+    box-shadow: 0 4px 12px rgba(55, 65, 81, 0.25);
+    transform: translateY(-2px);
+  }
+
+  button:active:not(:disabled) {
+    transform: scale(0.97);
+    box-shadow: 0 1px 6px rgba(17, 24, 39, 0.2);
+  }
+
+  button.primary {
+    background-color: var(--color-primary);
+  }
+
+  button.secondary {
+    background-color: transparent;
+    color: var(--color-primary-light);
+    border: 2px solid var(--color-primary-light);
+    box-shadow: none;
+  }
+
+  button.secondary:hover:not(:disabled) {
+    background-color: var(--color-primary-light);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(55, 65, 81, 0.25);
+    transform: translateY(-2px);
+  }
+
+  button.warning {
+    background-color: #fbbf24; /* amber-400 */
+    color: #92400e; /* amber-700 */
+    box-shadow: 0 2px 8px rgba(251, 191, 36, 0.3);
+  }
+
+  button.warning:hover:not(:disabled) {
+    background-color: #f59e0b;
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+  }
+
+  button.icon-btn {
+    padding: 0.5rem;
+    border-radius: 50%;
+    background-color: var(--color-primary-light);
+    color: #fff;
+    font-size: 21px;
+    box-shadow: 0 2px 6px rgba(55, 65, 81, 0.25);
+  }
+
+  button.icon-btn:hover:not(:disabled) {
+    background-color: var(--color-primary);
+    box-shadow: 0 4px 12px rgba(17, 24, 39, 0.3);
+    transform: scale(1.1);
+  }
+
+  /* Layout */
+
+  .flex {
+    display: flex;
+  }
+  .flex-center {
+    justify-content: center;
+    align-items: center;
+  }
+  .flex-between {
+    justify-content: space-between;
+    align-items: center;
+  }
+  .flex-col {
+    flex-direction: column;
+  }
+  .gap-sm {
+    gap: 0.75rem;
+  }
+  .gap-md {
+    gap: 1.5rem;
+  }
+  .gap-lg {
+    gap: 3rem;
+  }
+
+  .section {
+    margin-bottom: var(--spacing-vertical);
+  }
+
+  /* Card */
+
+  .card {
+    background-color: var(--color-card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card);
+    padding: 2.25rem 3rem;
+  }
+
+  /* Forms */
+
+  label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+    color: var(--color-primary-light);
+    user-select: text;
+  }
+
+  input[type="text"],
+  input[type="number"],
+  input[type="date"],
+  select {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    border-radius: var(--radius);
+    border: 1.5px solid var(--color-border);
+    background-color: var(--color-input-bg);
+    font-size: 17px;
+    color: var(--color-primary-light);
+    transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+  }
+
+  input[type="text"]:focus,
+  input[type="number"]:focus,
+  input[type="date"]:focus,
+  select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 8px var(--color-primary-light);
+    background-color: #ffffff;
+    color: var(--color-primary-dark);
+  }
+
+  input[type="file"] {
+    margin-top: 0.6rem;
+  }
+
+  .input-group {
+    margin-bottom: 1.75rem;
+  }
+
+  /* Image preview */
+
+  .img-preview {
+    margin-top: 0.75rem;
+    max-width: 100%;
+    max-height: 140px;
+    border-radius: var(--radius);
+    object-fit: contain;
+    box-shadow: 0 0 12px rgba(107,114,128,0.3);
+  }
+
+  /* Table */
+
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 14px;
+    margin-top: 1.75rem;
+    user-select: text;
+  }
+  th, td {
+    padding: 1rem 1.25rem;
+    text-align: left;
+    font-size: 17px;
+    background: var(--color-bg);
+    color: var(--color-primary-light);
+    border-radius: var(--radius);
+    border: 1px solid var(--color-border);
+  }
+  th {
+    background-color: var(--color-card-bg);
+    color: var(--color-primary);
+    font-weight: 700;
+    user-select: text;
+    box-shadow: none;
+  }
+  tbody tr {
+    transition: background-color 0.25s ease;
+    box-shadow: var(--shadow-card);
+    background-color: var(--color-card-bg);
+  }
+  tbody tr:hover {
+    background-color: #e0e7ff;
+  }
+
+  /* Background colors for alerts with subtle border */
+
+  tbody tr.expiry-warning {
+    background-color: #fef3c7;
+    border-left: 6px solid #fbbf24;
+  }
+
+  tbody tr.expiry-danger {
+    background-color: #fee2e2;
+    border-left: 6px solid #ef4444;
+  }
+
+  tbody tr.low-stock {
+    background-color: #fef9c3;
+    border-left: 6px solid #ca8a04;
+  }
+
+  /* Alert Notification */
+
+  .alert {
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius);
+    box-shadow: 0 1px 4px rgba(107, 114, 128, 0.15);
+    margin-bottom: 2rem;
+    user-select: text;
+    background-color: #f9fafb;
+    color: var(--color-primary-light);
+    font-weight: 600;
+    border: 1.5px solid #d1d5db;
+  }
+  .alert.warning {
+    background-color: #fef3c7;
+    color: #92400e;
+    border-color: #fbbf24;
+  }
+  .alert.error {
+    background-color: #fee2e2;
+    color: #b91c1c;
+    border-color: #ef4444;
+  }
+
+  /* Hide sections by default */
+
+  .hidden {
+    display: none !important;
+  }
+
+  /* Responsive */
+
+  @media (max-width: 767px) {
+    h1 {
+      font-size: 48px;
+    }
+    h2 {
+      font-size: 28px;
+    }
+    h3 {
+      font-size: 20px;
+    }
+    button {
+      font-size: 16px;
+      padding: 0.7rem 1.4rem;
+    }
+    th, td {
+      font-size: 15px;
+      padding: 0.8rem 1rem;
+    }
+  }
+
+  /* Modal styles */
+
+  #edit-modal {
+    position: fixed;
+    top: 12%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 420px;
+    z-index: 1000;
+    box-shadow: 0 6px 18px rgba(17, 24, 39, 0.15);
+    animation: slideUp 0.3s ease forwards;
+    background-color: var(--color-card-bg);
+    border-radius: var(--radius);
+    color: var(--color-primary-light);
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translate(-50%, 100%);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+  }
+
+  #modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(255,255,255,0.7);
+    z-index: 999;
+  }
+</style>
+</head>
+<body>
+  <div class="container" role="main">
+
+    <h1>📦 SICU1 SMART INVENTORY</h1>
+
+    <!-- Alert Section for Near Expiry / Low Stock -->
+    <section id="alert-section" class="section hidden" aria-live="polite" aria-atomic="true">
+      <h2>แจ้งเตือนวัสดุใกล้หมด</h2>
+      <div id="alert-list" class="flex-col gap-sm" role="alert" aria-relevant="additions"></div>
+    </section>
+
+    <!-- Main Buttons -->
+    <nav id="main-buttons" class="flex flex-col gap-lg section" aria-label="การนำทางหลัก">
+      <button id="btn-add-item" class="primary" aria-haspopup="true" aria-controls="add-menu" aria-expanded="false">
+        ➕ เพิ่มรายการพัสดุ
+      </button>
+      <button id="btn-list-items" class="primary" aria-haspopup="true" aria-controls="list-menu" aria-expanded="false">
+        📋 รายการพัสดุ
+      </button>
+    </nav>
+
+    <!-- Add Item Menu -->
+    <section id="add-menu" class="section hidden" aria-label="เมนูเพิ่มรายการพัสดุ">
+      <h2>เพิ่มรายการพัสดุ</h2>
+
+      <div class="flex flex-col gap-md">
+
+        <div class="flex gap-md" role="group" aria-label="เลือกประเภทวัสดุที่ต้องการเพิ่ม">
+          <button data-add-type="medical" class="secondary" id="btn-add-medical" aria-haspopup="true" aria-controls="add-medical-menu" aria-expanded="false">💊 วัสดุการแพทย์</button>
+          <button data-add-type="office" class="secondary" id="btn-add-office" aria-haspopup="true" aria-controls="add-office-menu" aria-expanded="false">🖇️ วัสดุสำนักงาน</button>
+        </div>
+
+        <!-- Medical add menu -->
+        <div id="add-medical-menu" class="hidden" aria-label="เพิ่มรายการวัสดุการแพทย์">
+          <div class="flex gap-md" role="group" aria-label="เลือกรูปแบบเพิ่มวัสดุการแพทย์">
+              <button data-new-existing="new" data-type="medical" class="secondary" id="btn-med-new">➕ รายการใหม่</button>
+              <button data-new-existing="existing" data-type="medical" class="secondary" id="btn-med-existing">📦 รายการที่มีอยู่</button>
+          </div>
+          <!-- Form new medical -->
+          <form id="form-med-new" class="section hidden card" aria-label="ฟอร์มเพิ่มวัสดุการแพทย์รายการใหม่" novalidate>
+            <h3>เพิ่มวัสดุรายการใหม่ (วัสดุการแพทย์)</h3>
+            <div class="input-group">
+              <label for="med-new-name">ชื่อวัสดุ</label>
+              <input type="text" id="med-new-name" required autocomplete="off" />
+            </div>
+            <div class="input-group">
+              <label for="med-new-unit">หน่วยนับ</label>
+              <input type="text" id="med-new-unit" required autocomplete="off" />
+            </div>
+            <div class="input-group">
+              <label for="med-new-receive">วันที่รับ</label>
+              <input type="date" id="med-new-receive" required />
+            </div>
+            <div class="input-group">
+              <label for="med-new-quantity">จำนวน</label>
+              <input type="number" id="med-new-quantity" min="1" required />
+            </div>
+            <div class="input-group">
+              <label for="med-new-expiry">วันหมดอายุ</label>
+              <input type="date" id="med-new-expiry" required />
+            </div>
+            <div class="input-group">
+              <label for="med-new-image">รูปภาพ</label>
+              <input type="file" id="med-new-image" accept="image/*" capture="environment" />
+              <img id="med-new-img-preview" class="img-preview" alt="รูปภาพตัวอย่าง" src="" hidden />
+            </div>
+            <button type="submit" class="primary">บันทึกวัสดุใหม่</button>
+          </form>
+
+          <!-- Form existing medical -->
+          <form id="form-med-existing" class="section hidden card" aria-label="ฟอร์มเพิ่มวัสดุการแพทย์รายการที่มีอยู่" novalidate>
+            <h3>เพิ่มวัสดุรายการที่มีอยู่ (วัสดุการแพทย์)</h3>
+            <div class="input-group">
+              <label for="med-existing-select">เลือกวัสดุ</label>
+              <select id="med-existing-select" required></select>
+            </div>
+            <div class="input-group">
+              <label for="med-existing-unit">หน่วยนับ</label>
+              <input type="text" id="med-existing-unit" disabled />
+            </div>
+            <div class="input-group">
+              <label for="med-existing-receive">วันที่รับ</label>
+              <input type="date" id="med-existing-receive" required />
+            </div>
+            <div class="input-group">
+              <label for="med-existing-quantity">จำนวน</label>
+              <input type="number" id="med-existing-quantity" min="1" required />
+            </div>
+            <div class="input-group">
+              <label>รูปภาพ</label>
+              <img id="med-existing-img-preview" class="img-preview" alt="รูปภาพวัสดุ" src="" />
+            </div>
+            <button type="submit" class="primary">เพิ่มจำนวนวัสดุ</button>
+          </form>
+        </div>
+
+        <!-- Office add menu -->
+        <div id="add-office-menu" class="hidden" aria-label="เพิ่มรายการวัสดุสำนักงาน">
+          <div class="flex gap-md" role="group" aria-label="เลือกรูปแบบเพิ่มวัสดุสำนักงาน">
+              <button data-new-existing="new" data-type="office" class="secondary" id="btn-off-new">➕ รายการใหม่</button>
+              <button data-new-existing="existing" data-type="office" class="secondary" id="btn-off-existing">📦 รายการที่มีอยู่</button>
+          </div>
+          <!-- Form new office -->
+          <form id="form-off-new" class="section hidden card" aria-label="ฟอร์มเพิ่มวัสดุสำนักงานรายการใหม่" novalidate>
+            <h3>เพิ่มวัสดุรายการใหม่ (วัสดุสำนักงาน)</h3>
+            <div class="input-group">
+              <label for="off-new-name">ชื่อวัสดุ</label>
+              <input type="text" id="off-new-name" required autocomplete="off" />
+            </div>
+            <div class="input-group">
+              <label for="off-new-unit">หน่วยนับ</label>
+              <input type="text" id="off-new-unit" required autocomplete="off" />
+            </div>
+            <div class="input-group">
+              <label for="off-new-receive">วันที่รับ</label>
+              <input type="date" id="off-new-receive" required />
+            </div>
+            <div class="input-group">
+              <label for="off-new-quantity">จำนวน</label>
+              <input type="number" id="off-new-quantity" min="1" required />
+            </div>
+            <div class="input-group">
+              <label for="off-new-image">รูปภาพ</label>
+              <input type="file" id="off-new-image" accept="image/*" capture="environment" />
+              <img id="off-new-img-preview" class="img-preview" alt="รูปภาพตัวอย่าง" src="" hidden />
+            </div>
+            <button type="submit" class="primary">บันทึกวัสดุใหม่</button>
+          </form>
+
+          <!-- Form existing office -->
+          <form id="form-off-existing" class="section hidden card" aria-label="ฟอร์มเพิ่มวัสดุสำนักงานรายการที่มีอยู่" novalidate>
+            <h3>เพิ่มวัสดุรายการที่มีอยู่ (วัสดุสำนักงาน)</h3>
+            <div class="input-group">
+              <label for="off-existing-select">เลือกวัสดุ</label>
+              <select id="off-existing-select" required></select>
+            </div>
+            <div class="input-group">
+              <label for="off-existing-unit">หน่วยนับ</label>
+              <input type="text" id="off-existing-unit" disabled />
+            </div>
+            <div class="input-group">
+              <label for="off-existing-receive">วันที่รับ</label>
+              <input type="date" id="off-existing-receive" required />
+            </div>
+            <div class="input-group">
+              <label for="off-existing-quantity">จำนวน</label>
+              <input type="number" id="off-existing-quantity" min="1" required />
+            </div>
+            <div class="input-group">
+              <label>รูปภาพ</label>
+              <img id="off-existing-img-preview" class="img-preview" alt="รูปภาพวัสดุ" src="" />
+            </div>
+            <button type="submit" class="primary">เพิ่มจำนวนวัสดุ</button>
+          </form>
+        </div>
+      </div>
+      <button id="btn-add-back" class="secondary" style="margin-top:1rem;">🔙 กลับ</button>
+    </section>
+
+    <!-- List Items Menu -->
+    <section id="list-menu" class="section hidden" aria-label="เมนูรายการพัสดุ">
+      <h2>รายการพัสดุ</h2>
+      <label for="list-type-select">เลือกประเภทวัสดุ</label>
+      <select id="list-type-select" aria-controls="list-table">
+        <option value="medical">💊 วัสดุการแพทย์</option>
+        <option value="office">🖇️ วัสดุสำนักงาน</option>
+      </select>
+      <div id="list-table-container" class="section">
+        <table id="list-table" aria-live="polite" aria-atomic="true" aria-label="ตารางรายการพัสดุ">
+          <thead>
+            <tr>
+              <th scope="col">ชื่อวัสดุ</th>
+              <th scope="col">วันหมดอายุ</th>
+              <th scope="col">จำนวน</th>
+              <th scope="col">หน่วยนับ</th>
+              <th scope="col" style="width: 6rem; text-align: center;">แก้ไข</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <button id="btn-list-back" class="secondary" style="margin-top:1rem;">🔙 กลับ</button>
+    </section>
+
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="card hidden" role="dialog" aria-modal="true" aria-labelledby="edit-modal-title">
+      <h3 id="edit-modal-title">แก้ไขวัสดุ</h3>
+      <form id="edit-form" novalidate>
+        <div class="input-group">
+          <label for="edit-name">ชื่อวัสดุ</label>
+          <input type="text" id="edit-name" required autocomplete="off" />
+        </div>
+        <div class="input-group">
+          <label for="edit-quantity">จำนวนสุทธิ</label>
+          <input type="number" id="edit-quantity" min="0" required />
+        </div>
+        <div class="input-group">
+          <label for="edit-image">เปลี่ยนรูปภาพ</label>
+          <input type="file" id="edit-image" accept="image/*" capture="environment" />
+          <img id="edit-img-preview" class="img-preview" alt="รูปภาพตัวอย่าง" src="" />
+        </div>
+        <div style="margin-top: 1rem; display: flex; justify-content: space-between;">
+          <button type="submit" class="primary">บันทึก</button>
+          <button type="button" id="btn-cancel" class="secondary">ยกเลิก</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Overlay -->
+    <div id="modal-overlay" class="hidden"></div>
+
+  </div>
+
+<script>
+  (() => {
+    const STORAGE_KEYS = {
+      medical: 'inventory_medical',
+      office: 'inventory_office',
+    };
+
+    const NEAR_EXPIRY_DAYS_YELLOW = 5;
+    const NEAR_EXPIRY_DAYS_RED = 3;
+    const LOW_STOCK_QUANTITY = 5;
+
+    let currentView = 'main';
+    let addType = null;
+    let addExistingNew = null;
+    let editItem = null;
+    let inventories = {
+      medical: [],
+      office: [],
+    };
+
+    // Element references
+    const elAlertSection = document.getElementById('alert-section');
+    const elAlertList = document.getElementById('alert-list');
+    const elMainButtons = document.getElementById('main-buttons');
+    const elAddMenu = document.getElementById('add-menu');
+    const elListMenu = document.getElementById('list-menu');
+    const elEditModal = document.getElementById('edit-modal');
+    const elModalOverlay = document.getElementById('modal-overlay');
+
+    function parseDate(str) {
+      if (!str) return null;
+      const parts = str.split('-').map(x => parseInt(x, 10));
+      if (parts.length !== 3) return null;
+      return new Date(parts[0], parts[1] - 1, parts[2]);
+    }
+    function formatDate(date) {
+      if (!date) return '';
+      const y = date.getFullYear();
+      const m = (date.getMonth() + 1).toString().padStart(2, '0');
+      const d = date.getDate().toString().padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+    function daysDiff(d1, d2) {
+      const diff = d2.getTime() - d1.getTime();
+      return Math.ceil(diff / (1000 * 3600 * 24));
+    }
+
+    function loadInventories() {
+      for (const key in STORAGE_KEYS) {
+        const stored = localStorage.getItem(STORAGE_KEYS[key]);
+        if (stored) {
+          try {
+            inventories[key] = JSON.parse(stored);
+          } catch {
+            inventories[key] = [];
+          }
+        } else {
+          inventories[key] = [];
+        }
+      }
+    }
+
+    function saveInventories() {
+      for (const key in STORAGE_KEYS) {
+        localStorage.setItem(STORAGE_KEYS[key], JSON.stringify(inventories[key]));
+      }
+    }
+
+    function sortByName(items) {
+      return items.slice().sort((a,b) => {
+        const nameA = a.name.trim().toLowerCase();
+        const nameB = b.name.trim().toLowerCase();
+        return nameA.localeCompare(nameB, 'th') || nameA.localeCompare(nameB, 'en');
+      });
+    }
+
+    function readImageFile(input, previewImg) {
+      if (input.files && input.files[0]) {
+        const file = input.files[0];
+        if (!file.type.startsWith('image/')) {
+          alert('ไฟล์ต้องเป็นรูปภาพเท่านั้น');
+          input.value = '';
+          previewImg.src = '';
+          previewImg.hidden = true;
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          previewImg.src = e.target.result;
+          previewImg.hidden = false;
+        };
+        reader.readAsDataURL(file);
+      } else {
+        previewImg.src = '';
+        previewImg.hidden = true;
+      }
+    }
+
+    function showElement(el) { el.classList.remove('hidden'); }
+    function hideElement(el) { el.classList.add('hidden'); }
+    function clearChildren(el) {
+      while (el.firstChild) el.removeChild(el.firstChild);
+    }
+
+    function updateMainButtonsAria(expanded) {
+      document.getElementById('btn-add-item').setAttribute('aria-expanded', expanded);
+      document.getElementById('btn-list-items').setAttribute('aria-expanded', expanded);
+    }
+
+    function showMainMenu() {
+      currentView = 'main';
+      hideElement(elAlertSection);
+      hideElement(elAddMenu);
+      hideElement(elListMenu);
+      hideElement(elEditModal);
+      hideElement(elModalOverlay);
+      showElement(elMainButtons);
+      updateMainButtonsAria(false);
+      addType = null;
+      addExistingNew = null;
+      clearAddSubmenus();
+      refreshAlerts();
+    }
+
+    function clearAddSubmenus() {
+      const sibs = [document.getElementById('add-medical-menu'), document.getElementById('add-office-menu')];
+      sibs.forEach(s => {
+        s.classList.add('hidden');
+        s.querySelectorAll('form').forEach(f => f.classList.add('hidden'));
+      });
+    }
+
+    function showAddMenu() {
+      currentView = 'add';
+      hideElement(elMainButtons);
+      hideElement(elListMenu);
+      hideElement(elEditModal);
+      hideElement(elModalOverlay);
+      showElement(elAddMenu);
+      updateMainButtonsAria(true);
+      clearAddSubmenus();
+      addType = null;
+      addExistingNew = null;
+    }
+
+    function showListMenu() {
+      currentView = 'list';
+      hideElement(elMainButtons);
+      hideElement(elAddMenu);
+      hideElement(elEditModal);
+      hideElement(elModalOverlay);
+      showElement(elListMenu);
+      updateMainButtonsAria(true);
+      renderListTable();
+    }
+
+    function showEditModal(type, index) {
+      currentView = 'edit';
+      editItem = { type, index };
+      const item = inventories[type][index];
+      if (!item) return alert('ไม่พบรายการที่ต้องการแก้ไข');
+
+      document.getElementById('edit-name').value = item.name;
+      document.getElementById('edit-quantity').value = item.quantity;
+      if (item.image) {
+        document.getElementById('edit-img-preview').src = item.image;
+        document.getElementById('edit-img-preview').hidden = false;
+      } else {
+        document.getElementById('edit-img-preview').src = '';
+        document.getElementById('edit-img-preview').hidden = true;
+      }
+
+      hideElement(elMainButtons);
+      hideElement(elAddMenu);
+      hideElement(elListMenu);
+      showElement(elEditModal);
+      showElement(elModalOverlay);
+    }
+
+    function hideEditModal() {
+      showMainMenu();
+      editItem = null;
+      document.getElementById('edit-form').reset();
+      document.getElementById('edit-img-preview').src = '';
+      document.getElementById('edit-img-preview').hidden = true;
+    }
+
+    function refreshAlerts() {
+      const now = new Date();
+      let alerts = [];
+
+      for (const type of ['medical', 'office']) {
+        for (const item of inventories[type]) {
+          if (item.expiryDate) {
+            const dExpiry = parseDate(item.expiryDate);
+            if (dExpiry) {
+              const diffDays = daysDiff(now, dExpiry);
+              if (diffDays >= 0 && diffDays <= NEAR_EXPIRY_DAYS_YELLOW) {
+                alerts.push({
+                  type: 'warning',
+                  text: `วัสดุ "${item.name}" (${type === 'medical' ? 'การแพทย์' : 'สำนักงาน'}) กำลังจะหมดอายุในอีก ${diffDays} วัน`,
+                });
+              }
+            }
+          }
+          if (item.quantity <= LOW_STOCK_QUANTITY) {
+            alerts.push({
+              type: 'warning',
+              text: `วัสดุ "${item.name}" (${type === 'medical' ? 'การแพทย์' : 'สำนักงาน'}) จำนวนใกล้หมด (${item.quantity} ${item.unit})`,
+            });
+          }
+        }
+      }
+
+      clearChildren(elAlertList);
+      if (alerts.length > 0) {
+        alerts.forEach(a => {
+          const div = document.createElement('div');
+          div.className = 'alert warning';
+          div.textContent = a.text;
+          elAlertList.appendChild(div);
+        });
+        showElement(elAlertSection);
+      } else {
+        hideElement(elAlertSection);
+      }
+    }
+
+    function addNewItem(type, item) {
+      inventories[type].push(item);
+      saveInventories();
+    }
+
+    // Render list table with background highlight for near expiry and low stock
+    function renderListTable() {
+      const select = document.getElementById('list-type-select');
+      const type = select.value;
+      const tbody = document.querySelector('#list-table tbody');
+      clearChildren(tbody);
+
+      let items = inventories[type] || [];
+      items = sortByName(items);
+
+      if (items.length === 0) {
+        const tr = document.createElement('tr');
+        const td = document.createElement('td');
+        td.setAttribute('colspan', 5);
+        td.textContent = 'ไม่มีรายการวัสดุในประเภทนี้';
+        td.style.textAlign = 'center';
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+        return;
+      }
+
+      const now = new Date();
+
+      for (const item of items) {
+        const tr = document.createElement('tr');
+
+        // Determine highlight class
+        tr.classList.remove('expiry-warning', 'expiry-danger', 'low-stock');
+        const expiryDate = parseDate(item.expiryDate);
+        const diffDays = expiryDate ? daysDiff(now, expiryDate) : null;
+
+        if (diffDays !== null) {
+          if (diffDays <= NEAR_EXPIRY_DAYS_RED) {
+            tr.classList.add('expiry-danger');
+          } else if (diffDays <= NEAR_EXPIRY_DAYS_YELLOW) {
+            tr.classList.add('expiry-warning');
+          }
+        }
+        if (item.quantity <= LOW_STOCK_QUANTITY) {
+          tr.classList.add('low-stock');
+        }
+
+        const tdName = document.createElement('td');
+        tdName.textContent = item.name;
+        tr.appendChild(tdName);
+
+        const tdExpiry = document.createElement('td');
+        tdExpiry.textContent = item.expiryDate ? item.expiryDate : '-';
+        tr.appendChild(tdExpiry);
+
+        const tdQty = document.createElement('td');
+        tdQty.textContent = item.quantity;
+        tr.appendChild(tdQty);
+
+        const tdUnit = document.createElement('td');
+        tdUnit.textContent = item.unit;
+        tr.appendChild(tdUnit);
+
+        // Edit button cell
+        const tdEdit = document.createElement('td');
+        tdEdit.style.textAlign = 'center';
+        const btnEdit = document.createElement('button');
+        btnEdit.className = 'secondary';
+        btnEdit.textContent = 'Edit';
+        btnEdit.setAttribute('aria-label', `แก้ไขวัสดุ ${item.name}`);
+        btnEdit.addEventListener('click', () => {
+          // Find exact index in inventories (preserves original order)
+          const idx = inventories[type].indexOf(item);
+          if (idx > -1) {
+            showEditModal(type, idx);
+          } else {
+            alert('ไม่พบรายการที่ต้องการแก้ไข');
+          }
+        });
+        tdEdit.appendChild(btnEdit);
+        tr.appendChild(tdEdit);
+
+        tbody.appendChild(tr);
+      }
+    }
+
+    // Add Item button handlers for choosing type
+    document.getElementById('btn-add-medical').addEventListener('click', () => {
+      addType = 'medical';
+      showAddSubMenu('medical');
+    });
+
+    document.getElementById('btn-add-office').addEventListener('click', () => {
+      addType = 'office';
+      showAddSubMenu('office');
+    });
+
+    function showAddSubMenu(type) {
+      clearAddSubmenus();
+      if (type === 'medical') showElement(document.getElementById('add-medical-menu'));
+      else if (type === 'office') showElement(document.getElementById('add-office-menu'));
+    }
+
+    ['med', 'off'].forEach(prefix => {
+      document.getElementById(`btn-${prefix}-new`).addEventListener('click', () => {
+        addExistingNew = 'new';
+        showAddForm(prefix, 'new');
+      });
+      document.getElementById(`btn-${prefix}-existing`).addEventListener('click', () => {
+        addExistingNew = 'existing';
+        showAddForm(prefix, 'existing');
+        populateExistingDropdown(prefix);
+      });
+    });
+
+    function showAddForm(prefix, newOrExist) {
+      const newForm = document.getElementById(`form-${prefix}-new`);
+      const existForm = document.getElementById(`form-${prefix}-existing`);
+      if (newOrExist === 'new') {
+        showElement(newForm);
+        hideElement(existForm);
+        newForm.reset();
+        hideImagePreview(`${prefix}-new-img-preview`);
+      } else {
+        showElement(existForm);
+        hideElement(newForm);
+        existForm.reset();
+        hideImagePreview(`${prefix}-existing-img-preview`);
+      }
+    }
+
+    function populateExistingDropdown(prefix) {
+      const select = document.getElementById(`${prefix}-existing-select`);
+      clearChildren(select);
+
+      const type = prefix === 'med' ? 'medical' : 'office';
+      const items = inventories[type] || [];
+      if (items.length === 0) {
+        const opt = document.createElement('option');
+        opt.textContent = 'ไม่มีวัสดุในระบบ';
+        opt.disabled = true;
+        select.appendChild(opt);
+        return;
+      }
+
+      const sorted = sortByName(items);
+      sorted.forEach(i => {
+        const opt = document.createElement('option');
+        opt.value = i.name;
+        opt.textContent = i.name;
+        select.appendChild(opt);
+      });
+
+      select.addEventListener('change', () => {
+        const selVal = select.value;
+        const item = items.find(x => x.name === selVal);
+        if (item) {
+          document.getElementById(`${prefix}-existing-unit`).value = item.unit;
+          document.getElementById(`${prefix}-existing-img-preview`).src = item.image || '';
+          document.getElementById(`${prefix}-existing-img-preview`).hidden = !item.image;
+        }
+      });
+
+      if (select.options.length > 0) {
+        select.selectedIndex = 0;
+        select.dispatchEvent(new Event('change'));
+      }
+    }
+
+    ['med-new-image', 'off-new-image', 'edit-image'].forEach(id => {
+      const input = document.getElementById(id);
+      input.addEventListener('change', () => {
+        const previewId = id === 'edit-image' ? 'edit-img-preview' : id.replace('image', 'img-preview');
+        const previewImg = document.getElementById(previewId);
+        readImageFile(input, previewImg);
+      });
+    });
+
+    function hideImagePreview(id) {
+      const img = document.getElementById(id);
+      img.hidden = true;
+      img.src = '';
+    }
+
+    // Add New Medical form submit with expiry split logic
+    document.getElementById('form-med-new').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('med-new-name').value.trim();
+      const unit = document.getElementById('med-new-unit').value.trim();
+      const receiveDate = document.getElementById('med-new-receive').value;
+      const quantity = parseInt(document.getElementById('med-new-quantity').value, 10);
+      const expiryDate = document.getElementById('med-new-expiry').value;
+      const imageInput = document.getElementById('med-new-image');
+
+      if (!name || !unit || !receiveDate || !quantity || !expiryDate) {
+        return alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+      }
+      if (quantity < 1) {
+        return alert('จำนวนต้องไม่น้อยกว่า 1');
+      }
+
+      // Check if same name + expiry exists
+      let existingItemIndex = inventories.medical.findIndex(i => 
+        i.name.toLowerCase() === name.toLowerCase() && i.expiryDate === expiryDate
+      );
+
+      if (existingItemIndex >= 0) {
+        inventories.medical[existingItemIndex].quantity += quantity;
+        saveInventories();
+        alert('เพิ่มจำนวนวัสดุการแพทย์เรียบร้อย');
+        showMainMenu();
+      } else {
+        let imageData = '';
+        if (imageInput.files && imageInput.files[0]) {
+          const reader = new FileReader();
+          reader.onload = function(event) {
+            imageData = event.target.result;
+            addNewItem('medical', { name, unit, receiveDate, quantity, expiryDate, image: imageData });
+            alert('บันทึกวัสดุการแพทย์ใหม่เรียบร้อย');
+            showMainMenu();
+          };
+          reader.readAsDataURL(imageInput.files[0]);
+        } else {
+          addNewItem('medical', { name, unit, receiveDate, quantity, expiryDate, image: '' });
+          alert('บันทึกวัสดุการแพทย์ใหม่เรียบร้อย');
+          showMainMenu();
+        }
+      }
+    });
+
+    // Add Existing Medical form submit
+    document.getElementById('form-med-existing').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const select = document.getElementById('med-existing-select');
+      const selectedName = select.value;
+      const receiveDate = document.getElementById('med-existing-receive').value;
+      const quantity = parseInt(document.getElementById('med-existing-quantity').value, 10);
+      const expiryDate = document.getElementById('med-existing-expiry') ? document.getElementById('med-existing-expiry').value : '';
+
+      if (!selectedName || !receiveDate || !quantity) {
+        return alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+      }
+      if (quantity < 1) {
+        return alert('จำนวนต้องไม่น้อยกว่า 1');
+      }
+      // Add as a new entry if expiry differs
+      const items = inventories.medical.filter(i => i.name === selectedName);
+      const sameExpiry = items.find(i => i.expiryDate === expiryDate);
+
+      if (sameExpiry) {
+        sameExpiry.quantity += quantity;
+        sameExpiry.receiveDate = receiveDate;
+      } else {
+        // Pick unit, image from any existing same name
+        const templateItem = items[0];
+        addNewItem('medical', { 
+          name: selectedName, 
+          unit: templateItem.unit, 
+          receiveDate, 
+          quantity, 
+          expiryDate, 
+          image: templateItem.image || ''
+        });
+      }
+      saveInventories();
+      alert('เพิ่มจำนวนวัสดุเรียบร้อย');
+      showMainMenu();
+    });
+
+    // Add New Office form submit (no expiry)
+    document.getElementById('form-off-new').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('off-new-name').value.trim();
+      const unit = document.getElementById('off-new-unit').value.trim();
+      const receiveDate = document.getElementById('off-new-receive').value;
+      const quantity = parseInt(document.getElementById('off-new-quantity').value, 10);
+      const imageInput = document.getElementById('off-new-image');
+
+      if (!name || !unit || !receiveDate || !quantity) {
+        return alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+      }
+      if (quantity < 1) {
+        return alert('จำนวนต้องไม่น้อยกว่า 1');
+      }
+
+      if (inventories.office.find(i => i.name.toLowerCase() === name.toLowerCase())) {
+        alert('ชื่อวัสดุซ้ำในระบบ');
+        return;
+      }
+
+      let imageData = '';
+      if (imageInput.files && imageInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          imageData = event.target.result;
+          addNewItem('office', { name, unit, receiveDate, quantity, expiryDate: '', image: imageData });
+          alert('บันทึกวัสดุสำนักงานใหม่เรียบร้อย');
+          showMainMenu();
+        };
+        reader.readAsDataURL(imageInput.files[0]);
+      } else {
+        addNewItem('office', { name, unit, receiveDate, quantity, expiryDate: '', image: '' });
+        alert('บันทึกวัสดุสำนักงานใหม่เรียบร้อย');
+        showMainMenu();
+      }
+    });
+
+    // Add Existing Office form submit
+    document.getElementById('form-off-existing').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const select = document.getElementById('off-existing-select');
+      const selectedName = select.value;
+      const receiveDate = document.getElementById('off-existing-receive').value;
+      const quantity = parseInt(document.getElementById('off-existing-quantity').value, 10);
+
+      if (!selectedName || !receiveDate || !quantity) {
+        return alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+      }
+      if (quantity < 1) {
+        return alert('จำนวนต้องไม่น้อยกว่า 1');
+      }
+      const item = inventories.office.find(i => i.name === selectedName);
+      if (!item) return alert('ไม่พบวัสดุที่เลือก');
+
+      item.quantity += quantity;
+      item.receiveDate = receiveDate;
+      saveInventories();
+      alert('เพิ่มจำนวนวัสดุเรียบร้อย');
+      showMainMenu();
+    });
+
+    // Edit form image preview
+    document.getElementById('edit-image').addEventListener('change', () => {
+      const input = document.getElementById('edit-image');
+      const previewImg = document.getElementById('edit-img-preview');
+      readImageFile(input, previewImg);
+    });
+
+    // Edit form submit
+    document.getElementById('edit-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!editItem) return alert('ไม่มีข้อมูลสำหรับแก้ไข');
+      const name = document.getElementById('edit-name').value.trim();
+      const quantity = parseInt(document.getElementById('edit-quantity').value, 10);
+
+      if (!name) return alert('กรุณาใส่ชื่อวัสดุ');
+      if (quantity < 0) return alert('จำนวนต้องไม่น้อยกว่า 0');
+
+      const item = inventories[editItem.type][editItem.index];
+      if (!item) return alert('ไม่พบวัสดุสำหรับแก้ไข');
+
+      if (inventories[editItem.type].some((i, idx) => i.name.toLowerCase() === name.toLowerCase() && idx !== editItem.index)) {
+        return alert('ชื่อวัสดุซ้ำในระบบ');
+      }
+
+      item.name = name;
+      item.quantity = quantity;
+
+      const fileInput = document.getElementById('edit-image');
+      if (fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          item.image = event.target.result;
+          saveInventories();
+          alert('บันทึกข้อมูลวัสดุเรียบร้อย');
+          hideEditModal();
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+      } else {
+        saveInventories();
+        alert('บันทึกข้อมูลวัสดุเรียบร้อย');
+        hideEditModal();
+      }
+    });
+
+    // Cancel edit modal
+    document.getElementById('btn-cancel').addEventListener('click', () => {
+      hideEditModal();
+    });
+
+    // Back buttons handlers
+    document.getElementById('btn-add-back').addEventListener('click', () => {
+      showMainMenu();
+    });
+    document.getElementById('btn-list-back').addEventListener('click', () => {
+      showMainMenu();
+    });
+
+    // Dropdown change handlers
+    document.getElementById('list-type-select').addEventListener('change', () => {
+      renderListTable();
+    });
+
+    // Modal overlay closes modal
+    elModalOverlay.addEventListener('click', () => {
+      hideEditModal();
+    });
+
+    // Main buttons event listeners
+    document.getElementById('btn-add-item').addEventListener('click', () => {
+      showAddMenu();
+    });
+    document.getElementById('btn-list-items').addEventListener('click', () => {
+      showListMenu();
+    });
+
+    // Register service worker for PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js').then(registration => {
+          console.log('ServiceWorker registration successful with scope: ', registration.scope);
+        }).catch(err => {
+          console.log('ServiceWorker registration failed: ', err);
+        });
+      });
+    }
+
+    function init() {
+      loadInventories();
+      showMainMenu();
+    }
+
+    init();
+
+  })();
+</script>
+
+</body>
+</html>
+
