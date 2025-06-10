@@ -390,6 +390,73 @@
     background: rgba(255,255,255,0.7);
     z-index: 999;
   }
+  
+  /* Delete menu styles */
+  #delete-menu {
+    margin-bottom: var(--spacing-vertical);
+  }
+
+  #delete-type-select {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    font-size: 17px;
+    border-radius: var(--radius);
+    border: 1.5px solid var(--color-border);
+    background-color: var(--color-input-bg);
+    color: var(--color-primary-light);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+    transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
+    margin-bottom: 1.5rem;
+  }
+
+  #delete-type-select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 8px var(--color-primary-light);
+  }
+
+  #delete-list {
+    max-height: 360px;
+    overflow-y: auto;
+    background-color: var(--color-card-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card);
+    padding: 1rem 1rem;
+  }
+
+  .delete-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--radius);
+    border: 1px solid var(--color-border);
+    margin-bottom: 0.5rem;
+    font-size: 17px;
+    color: var(--color-primary-light);
+    transition: background-color var(--transition-speed);
+    user-select: text;
+  }
+
+  .delete-item:hover {
+    background-color: #fee2e2;
+    color: var(--color-error);
+  }
+
+  .delete-item button {
+    background: transparent;
+    border: none;
+    color: var(--color-error);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0;
+    user-select: none;
+    transition: color var(--transition-speed);
+  }
+
+  .delete-item button:hover {
+    color: #b91c1c;
+  }
 </style>
 </head>
 <body>
@@ -410,6 +477,9 @@
       </button>
       <button id="btn-list-items" class="primary" aria-haspopup="true" aria-controls="list-menu" aria-expanded="false">
         📋 รายการพัสดุ
+      </button>
+      <button id="btn-delete-item" class="primary" aria-haspopup="true" aria-controls="delete-menu" aria-expanded="false">
+        🗑️ ลบรายการพัสดุ
       </button>
     </nav>
 
@@ -576,6 +646,19 @@
       <button id="btn-list-back" class="secondary" style="margin-top:1rem;">🔙 กลับ</button>
     </section>
 
+    <!-- Delete Items Menu -->
+    <section id="delete-menu" class="section hidden" aria-label="เมนูลบรายการพัสดุ">
+      <h2>ลบรายการพัสดุ</h2>
+      <label for="delete-type-select">เลือกประเภทวัสดุ</label>
+      <select id="delete-type-select" aria-controls="delete-list" aria-label="เลือกประเภทวัสดุเพื่อแสดงรายการที่ลบ">
+        <option value="" selected>-- โปรดเลือกประเภทวัสดุ --</option>
+        <option value="medical">💊 วัสดุการแพทย์</option>
+        <option value="office">🖇️ วัสดุสำนักงาน</option>
+      </select>
+      <div id="delete-list" aria-live="polite" aria-atomic="true" aria-relevant="additions"></div>
+      <button id="btn-delete-back" class="secondary" style="margin-top:1rem;">🔙 กลับ</button>
+    </section>
+
     <!-- Edit Modal -->
     <div id="edit-modal" class="card hidden" role="dialog" aria-modal="true" aria-labelledby="edit-modal-title">
       <h3 id="edit-modal-title">แก้ไขวัสดุ</h3>
@@ -631,6 +714,9 @@
     const elMainButtons = document.getElementById('main-buttons');
     const elAddMenu = document.getElementById('add-menu');
     const elListMenu = document.getElementById('list-menu');
+    const elDeleteMenu = document.getElementById('delete-menu');
+    const elDeleteTypeSelect = document.getElementById('delete-type-select');
+    const elDeleteList = document.getElementById('delete-list');
     const elEditModal = document.getElementById('edit-modal');
     const elModalOverlay = document.getElementById('modal-overlay');
 
@@ -712,6 +798,7 @@
     function updateMainButtonsAria(expanded) {
       document.getElementById('btn-add-item').setAttribute('aria-expanded', expanded);
       document.getElementById('btn-list-items').setAttribute('aria-expanded', expanded);
+      document.getElementById('btn-delete-item').setAttribute('aria-expanded', expanded);
     }
 
     function showMainMenu() {
@@ -719,6 +806,7 @@
       hideElement(elAlertSection);
       hideElement(elAddMenu);
       hideElement(elListMenu);
+      hideElement(elDeleteMenu);
       hideElement(elEditModal);
       hideElement(elModalOverlay);
       showElement(elMainButtons);
@@ -726,6 +814,7 @@
       addType = null;
       addExistingNew = null;
       clearAddSubmenus();
+      clearDeleteSelection();
       refreshAlerts();
     }
 
@@ -737,12 +826,17 @@
       });
     }
 
+    function clearDeleteSelection() {
+      elDeleteTypeSelect.value = '';
+      clearChildren(elDeleteList);
+    }
+
     function showAddMenu() {
       currentView = 'add';
       hideElement(elMainButtons);
       hideElement(elListMenu);
+      hideElement(elDeleteMenu);
       hideElement(elEditModal);
-      hideElement(elModalOverlay);
       showElement(elAddMenu);
       updateMainButtonsAria(true);
       clearAddSubmenus();
@@ -754,11 +848,61 @@
       currentView = 'list';
       hideElement(elMainButtons);
       hideElement(elAddMenu);
+      hideElement(elDeleteMenu);
       hideElement(elEditModal);
-      hideElement(elModalOverlay);
       showElement(elListMenu);
       updateMainButtonsAria(true);
       renderListTable();
+    }
+
+    function showDeleteMenu() {
+      currentView = 'delete';
+      hideElement(elMainButtons);
+      hideElement(elAddMenu);
+      hideElement(elListMenu);
+      hideElement(elEditModal);
+      showElement(elDeleteMenu);
+      updateMainButtonsAria(true);
+      clearDeleteSelection();
+    }
+
+    function renderDeleteList(type) {
+      clearChildren(elDeleteList);
+      if (!type || !inventories[type] || inventories[type].length === 0) {
+        const emptyMsg = document.createElement('div');
+        emptyMsg.textContent = 'ไม่มีรายการพัสดุในประเภทนี้';
+        emptyMsg.style.color = 'var(--color-primary-light)';
+        emptyMsg.style.fontSize = '17px';
+        emptyMsg.style.textAlign = 'center';
+        elDeleteList.appendChild(emptyMsg);
+        return;
+      }
+      const sortedItems = sortByName(inventories[type]);
+      sortedItems.forEach(item => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'delete-item';
+        itemDiv.textContent = item.name;
+
+        const btnDelete = document.createElement('button');
+        btnDelete.setAttribute('aria-label', `ลบวัสดุ ${item.name}`);
+        btnDelete.innerHTML = '&#x2715;'; // Multiplication X symbol as delete icon
+        btnDelete.addEventListener('click', () => {
+          if (confirm(`คุณแน่ใจหรือไม่ว่าจะลบวัสดุ "${item.name}"? การดำเนินการนี้ไม่สามารถย้อนกลับได้`)) {
+            // Find index in original inventories array (for safety)
+            const idx = inventories[type].findIndex(i => i === item);
+            if (idx > -1) {
+              inventories[type].splice(idx, 1);
+              saveInventories();
+              renderDeleteList(type);
+              refreshAlerts();
+              alert(`ลบวัสดุ "${item.name}" เรียบร้อยแล้ว`);
+            }
+          }
+        });
+
+        itemDiv.appendChild(btnDelete);
+        elDeleteList.appendChild(itemDiv);
+      });
     }
 
     function showEditModal(type, index) {
@@ -780,6 +924,7 @@
       hideElement(elMainButtons);
       hideElement(elAddMenu);
       hideElement(elListMenu);
+      hideElement(elDeleteMenu);
       showElement(elEditModal);
       showElement(elModalOverlay);
     }
@@ -1220,10 +1365,16 @@
     document.getElementById('btn-list-back').addEventListener('click', () => {
       showMainMenu();
     });
+    document.getElementById('btn-delete-back').addEventListener('click', () => {
+      showMainMenu();
+    });
 
     // Dropdown change handlers
     document.getElementById('list-type-select').addEventListener('change', () => {
       renderListTable();
+    });
+    elDeleteTypeSelect.addEventListener('change', () => {
+      renderDeleteList(elDeleteTypeSelect.value);
     });
 
     // Modal overlay closes modal
@@ -1237,6 +1388,9 @@
     });
     document.getElementById('btn-list-items').addEventListener('click', () => {
       showListMenu();
+    });
+    document.getElementById('btn-delete-item').addEventListener('click', () => {
+      showDeleteMenu();
     });
 
     // Register service worker for PWA
